@@ -1,93 +1,199 @@
 package com.quizhub.service;
 
-import com.quizhub.model.AnswerRequest;
 import com.quizhub.model.Question;
 import com.quizhub.model.QuestionResponse;
+import com.quizhub.model.AnswerRequest;
 import com.quizhub.model.QuizResult;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class QuizService {
 
-    private final List<Question> questionBank = new ArrayList<>();
+    private final List<Question> questions = new ArrayList<>();
 
     public QuizService() {
-        initSampleQuestions();
-    }
 
-    private void initSampleQuestions() {
-        questionBank.add(new Question(
+        // Java Questions
+
+        questions.add(new Question(
                 1,
-                "Which programming language is known as the backbone of Spring Boot?",
-                List.of("Python", "Java", "C++", "JavaScript"),
-                1
+                "Java",
+                "Which keyword is used to create a class in Java?",
+                "function",
+                "class",
+                "create",
+                "object",
+                "B"
         ));
-        questionBank.add(new Question(
+
+        questions.add(new Question(
                 2,
-                "What is the default port for an embedded Tomcat server in Spring Boot?",
-                List.of("8080", "3000", "5000", "8000"),
-                0
+                "Java",
+                "Which method is the starting point of a Java program?",
+                "start()",
+                "run()",
+                "main()",
+                "begin()",
+                "C"
         ));
-        questionBank.add(new Question(
+
+        questions.add(new Question(
                 3,
-                "Which annotation marks a class as a Spring Boot entry point?",
-                List.of("@Controller", "@SpringBootApplication", "@Service", "@Component"),
-                1
+                "Java",
+                "Which data type is used to store whole numbers?",
+                "String",
+                "int",
+                "boolean",
+                "double",
+                "B"
         ));
-        questionBank.add(new Question(
+
+        questions.add(new Question(
                 4,
-                "Which HTTP method is commonly used to submit quiz answers?",
-                List.of("GET", "DELETE", "POST", "HEAD"),
-                2
+                "Java",
+                "Which keyword is used to create an object?",
+                "new",
+                "object",
+                "create",
+                "this",
+                "A"
         ));
-        questionBank.add(new Question(
+
+        questions.add(new Question(
                 5,
-                "What format is most commonly used for data exchange in modern RESTful APIs?",
-                List.of("XML", "JSON", "CSV", "YAML"),
-                1
+                "Java",
+                "Which symbol is used to end a statement in Java?",
+                ".",
+                ":",
+                ";",
+                ",",
+                "C"
+        ));
+
+        // Python Questions
+
+        questions.add(new Question(
+                6,
+                "Python",
+                "Which keyword is used to define a function in Python?",
+                "function",
+                "def",
+                "fun",
+                "define",
+                "B"
+        ));
+
+        questions.add(new Question(
+                7,
+                "Python",
+                "Which symbol is used for a comment in Python?",
+                "//",
+                "/*",
+                "#",
+                "<!--",
+                "C"
+        ));
+
+        // General Knowledge
+
+        questions.add(new Question(
+                8,
+                "General",
+                "What is the capital of India?",
+                "Mumbai",
+                "New Delhi",
+                "Kolkata",
+                "Chennai",
+                "B"
+        ));
+
+        questions.add(new Question(
+                9,
+                "General",
+                "Which planet is known as the Red Planet?",
+                "Earth",
+                "Venus",
+                "Mars",
+                "Jupiter",
+                "C"
+        ));
+
+        questions.add(new Question(
+                10,
+                "General",
+                "How many continents are there on Earth?",
+                "Five",
+                "Six",
+                "Seven",
+                "Eight",
+                "C"
         ));
     }
 
-    public List<QuestionResponse> getAllQuestions() {
-        return questionBank.stream()
-                .map(q -> new QuestionResponse(q.getId(), q.getQuestion(), q.getOptions()))
-                .collect(Collectors.toList());
-    }
+    public List<QuestionResponse> getQuestions(String category) {
 
-    public QuizResult evaluateQuiz(AnswerRequest answerRequest) {
-        int total = questionBank.size();
-        int correctCount = 0;
-        Map<Integer, Integer> correctOptionsMap = new HashMap<>();
-        Map<Integer, Integer> userAnswers = answerRequest != null && answerRequest.getAnswers() != null
-                ? answerRequest.getAnswers()
-                : new HashMap<>();
+        List<QuestionResponse> result = new ArrayList<>();
 
-        for (Question q : questionBank) {
-            correctOptionsMap.put(q.getId(), q.getCorrectOptionIndex());
-            Integer userSelection = userAnswers.get(q.getId());
-            if (userSelection != null && userSelection == q.getCorrectOptionIndex()) {
-                correctCount++;
+        for (Question question : questions) {
+
+            if (category == null ||
+                    question.getCategory().equalsIgnoreCase(category)) {
+
+                result.add(new QuestionResponse(
+                        question.getId(),
+                        question.getCategory(),
+                        question.getQuestion(),
+                        question.getOptionA(),
+                        question.getOptionB(),
+                        question.getOptionC(),
+                        question.getOptionD()
+                ));
             }
         }
 
-        int percentage = total > 0 ? (int) Math.round(((double) correctCount / total) * 100) : 0;
-        String feedback;
-        if (percentage == 100) {
-            feedback = "Outstanding! Perfect score! 🎉";
-        } else if (percentage >= 80) {
-            feedback = "Great job! You really know your stuff! 🚀";
-        } else if (percentage >= 50) {
-            feedback = "Good effort! Keep practicing to sharpen your skills. 👍";
-        } else {
-            feedback = "Keep learning and try again! You can do it! 💪";
+        return result;
+    }
+
+    public QuizResult calculateResult(List<AnswerRequest> answers) {
+
+        int correct = 0;
+
+        for (AnswerRequest answer : answers) {
+
+            for (Question question : questions) {
+
+                if (question.getId() == answer.getQuestionId()) {
+
+                    if (question.getCorrectAnswer()
+                            .equalsIgnoreCase(answer.getSelectedAnswer())) {
+
+                        correct++;
+                    }
+
+                    break;
+                }
+            }
         }
 
-        return new QuizResult(total, correctCount, percentage, feedback, correctOptionsMap);
+        int total = answers.size();
+
+        int wrong = total - correct;
+
+        double percentage = 0;
+
+        if (total > 0) {
+            percentage = ((double) correct / total) * 100;
+        }
+
+        return new QuizResult(
+                total,
+                correct,
+                wrong,
+                percentage
+        );
     }
 }
