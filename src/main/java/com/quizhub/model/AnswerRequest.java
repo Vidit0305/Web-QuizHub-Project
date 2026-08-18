@@ -1,23 +1,26 @@
 package com.quizhub.model;
 
-import java.util.Map;
-
 public class AnswerRequest {
-    // Map of questionId -> selectedOptionIndex
-    private Map<Integer, Integer> answers;
+
+    private int questionId;
+    private String selectedAnswer;
 
     public AnswerRequest() {
     }
 
-    public AnswerRequest(Map<Integer, Integer> answers) {
-        this.answers = answers;
+    public int getQuestionId() {
+        return questionId;
     }
 
-    public Map<Integer, Integer> getAnswers() {
-        return answers;
+    public void setQuestionId(int questionId) {
+        this.questionId = questionId;
     }
 
-    public void setAnswers(Map<Integer, Integer> answers) {
-        this.answers = answers;
+    public String getSelectedAnswer() {
+        return selectedAnswer;
+    }
+
+    public void setSelectedAnswer(String selectedAnswer) {
+        this.selectedAnswer = selectedAnswer;
     }
 }
