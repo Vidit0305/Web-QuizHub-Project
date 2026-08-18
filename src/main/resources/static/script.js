@@ -1,255 +1,418 @@
-// State Management
 let questions = [];
+
 let currentQuestionIndex = 0;
-let userAnswers = {}; // { questionId: selectedOptionIndex }
 
-// DOM Elements
-const startScreen = document.getElementById('startScreen');
-const quizScreen = document.getElementById('quizScreen');
-const resultScreen = document.getElementById('resultScreen');
+let selectedAnswer = null;
 
-const startBtn = document.getElementById('startBtn');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-const submitBtn = document.getElementById('submitBtn');
-const restartBtn = document.getElementById('restartBtn');
+let userAnswers = [];
 
-const currentQuestionNumEl = document.getElementById('currentQuestionNum');
-const totalQuestionsNumEl = document.getElementById('totalQuestionsNum');
-const totalQuestionsCountEl = document.getElementById('totalQuestionsCount');
-const progressBarEl = document.getElementById('progressBar');
-const questionTextEl = document.getElementById('questionText');
-const optionsContainerEl = document.getElementById('optionsContainer');
+let currentCategory = "";
 
-const scorePercentageEl = document.getElementById('scorePercentage');
-const scoreRingProgressEl = document.getElementById('scoreRingProgress');
-const feedbackTitleEl = document.getElementById('feedbackTitle');
-const feedbackTextEl = document.getElementById('feedbackText');
-const correctAnswersStatEl = document.getElementById('correctAnswersStat');
-const totalQuestionsStatEl = document.getElementById('totalQuestionsStat');
-const reviewContainerEl = document.getElementById('reviewContainer');
 
-// Default fallback questions in case API is offline during UI testing
-const fallbackQuestions = [
-    {
-        id: 1,
-        question: "Which programming language is known as the backbone of Spring Boot?",
-        options: ["Python", "Java", "C++", "JavaScript"]
-    },
-    {
-        id: 2,
-        question: "What is the default port for an embedded Tomcat server in Spring Boot?",
-        options: ["8080", "3000", "5000", "8000"]
-    },
-    {
-        id: 3,
-        question: "Which annotation marks a class as a Spring Boot entry point?",
-        options: ["@Controller", "@SpringBootApplication", "@Service", "@Component"]
-    },
-    {
-        id: 4,
-        question: "Which HTTP method is commonly used to submit quiz answers?",
-        options: ["GET", "DELETE", "POST", "HEAD"]
-    },
-    {
-        id: 5,
-        question: "What format is most commonly used for data exchange in modern RESTful APIs?",
-        options: ["XML", "JSON", "CSV", "YAML"]
-    }
-];
+/* ==============================
+   START QUIZ
+============================== */
 
-// Fetch questions from backend
-async function loadQuestions() {
+async function startQuiz(category) {
+
+    currentCategory = category;
+
     try {
-        const response = await fetch('/api/quiz/questions');
-        if (response.ok) {
-            questions = await response.json();
-        } else {
-            console.warn('API returned non-OK status, falling back to built-in questions');
-            questions = fallbackQuestions;
+
+        const response = await fetch(
+            `/api/questions?category=${category}`
+        );
+
+        questions = await response.json();
+
+        if (questions.length === 0) {
+
+            alert("No questions found.");
+
+            return;
         }
-    } catch (err) {
-        console.warn('Using fallback questions:', err);
-        questions = fallbackQuestions;
+
+        currentQuestionIndex = 0;
+
+        userAnswers = [];
+
+        showScreen("quizScreen");
+
+        document.getElementById(
+            "quizCategory"
+        ).textContent = category;
+
+        document.getElementById(
+            "totalQuestions"
+        ).textContent = questions.length;
+
+        showQuestion();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Unable to connect to the Java backend."
+        );
     }
-
-    totalQuestionsCountEl.textContent = questions.length;
-    totalQuestionsNumEl.textContent = questions.length;
 }
 
-// Start Quiz
-function startQuiz() {
-    userAnswers = {};
-    currentQuestionIndex = 0;
-    startScreen.classList.add('hidden');
-    resultScreen.classList.add('hidden');
-    quizScreen.classList.remove('hidden');
-    quizScreen.classList.add('fade-in');
-    renderQuestion();
-}
 
-// Render Current Question
-function renderQuestion() {
-    const q = questions[currentQuestionIndex];
-    currentQuestionNumEl.textContent = currentQuestionIndex + 1;
-    questionTextEl.textContent = q.question;
+/* ==============================
+   SHOW QUESTION
+============================== */
 
-    // Progress Bar
-    const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
-    progressBarEl.style.width = `${progressPercent}%`;
+function showQuestion() {
 
-    // Render Options
-    optionsContainerEl.innerHTML = '';
-    const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+    const question =
+        questions[currentQuestionIndex];
 
-    q.options.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.className = `option-btn ${userAnswers[q.id] === idx ? 'selected' : ''}`;
-        btn.innerHTML = `
-            <span class="option-letter">${letters[idx] || idx + 1}</span>
-            <span class="option-text">${opt}</span>
+    selectedAnswer = null;
+
+    document.getElementById(
+        "currentQuestion"
+    ).textContent =
+        currentQuestionIndex + 1;
+
+
+    document.getElementById(
+        "questionText"
+    ).textContent =
+        question.question;
+
+
+    const progress =
+        ((currentQuestionIndex + 1)
+            / questions.length) * 100;
+
+
+    document.getElementById(
+        "progressBar"
+    ).style.width =
+        `${progress}%`;
+
+
+    const optionsContainer =
+        document.getElementById(
+            "optionsContainer"
+        );
+
+
+    optionsContainer.innerHTML = "";
+
+
+    const options = [
+
+        {
+            letter: "A",
+            text: question.optionA
+        },
+
+        {
+            letter: "B",
+            text: question.optionB
+        },
+
+        {
+            letter: "C",
+            text: question.optionC
+        },
+
+        {
+            letter: "D",
+            text: question.optionD
+        }
+
+    ];
+
+
+    options.forEach(option => {
+
+        const button =
+            document.createElement("button");
+
+        button.className = "option";
+
+
+        button.innerHTML = `
+            <span class="option-letter">
+                ${option.letter}
+            </span>
+
+            ${option.text}
         `;
-        btn.addEventListener('click', () => selectOption(q.id, idx));
-        optionsContainerEl.appendChild(btn);
+
+
+        button.onclick = function () {
+
+            selectAnswer(
+                option.letter,
+                button
+            );
+
+        };
+
+
+        optionsContainer.appendChild(button);
+
     });
 
-    // Navigation buttons state
-    prevBtn.disabled = currentQuestionIndex === 0;
-    
-    if (currentQuestionIndex === questions.length - 1) {
-        nextBtn.classList.add('hidden');
-        submitBtn.classList.remove('hidden');
+
+    const nextButton =
+        document.getElementById(
+            "nextButton"
+        );
+
+
+    if (
+        currentQuestionIndex ===
+        questions.length - 1
+    ) {
+
+        nextButton.textContent =
+            "Submit Quiz";
+
     } else {
-        nextBtn.classList.remove('hidden');
-        submitBtn.classList.add('hidden');
+
+        nextButton.textContent =
+            "Next Question →";
     }
 }
 
-// Select an option
-function selectOption(questionId, optionIndex) {
-    userAnswers[questionId] = optionIndex;
-    renderQuestion();
+
+/* ==============================
+   SELECT ANSWER
+============================== */
+
+function selectAnswer(
+    answer,
+    button
+) {
+
+    selectedAnswer = answer;
+
+
+    const allOptions =
+        document.querySelectorAll(
+            ".option"
+        );
+
+
+    allOptions.forEach(option => {
+
+        option.classList.remove(
+            "selected"
+        );
+
+    });
+
+
+    button.classList.add("selected");
 }
 
-// Navigate
-function prevQuestion() {
-    if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        renderQuestion();
-    }
-}
+
+/* ==============================
+   NEXT QUESTION
+============================== */
 
 function nextQuestion() {
-    if (currentQuestionIndex < questions.length - 1) {
+
+    if (selectedAnswer === null) {
+
+        alert(
+            "Please select an answer first."
+        );
+
+        return;
+    }
+
+
+    const question =
+        questions[currentQuestionIndex];
+
+
+    userAnswers.push({
+
+        questionId: question.id,
+
+        selectedAnswer: selectedAnswer
+
+    });
+
+
+    if (
+        currentQuestionIndex <
+        questions.length - 1
+    ) {
+
         currentQuestionIndex++;
-        renderQuestion();
-    }
-}
 
-// Submit Quiz
-async function submitQuiz() {
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Grading...";
+        showQuestion();
 
-    let result;
-    try {
-        const response = await fetch('/api/quiz/submit', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ answers: userAnswers })
-        });
-
-        if (response.ok) {
-            result = await response.json();
-        } else {
-            result = localEvaluate();
-        }
-    } catch (e) {
-        result = localEvaluate();
-    }
-
-    displayResults(result);
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = `<span>Submit Quiz</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>`;
-}
-
-// Fallback local evaluation
-function localEvaluate() {
-    const correctMap = { 1: 1, 2: 0, 3: 1, 4: 2, 5: 1 };
-    let correct = 0;
-    questions.forEach(q => {
-        if (userAnswers[q.id] === correctMap[q.id]) {
-            correct++;
-        }
-    });
-    const percentage = Math.round((correct / questions.length) * 100);
-    return {
-        totalQuestions: questions.length,
-        correctAnswers: correct,
-        scorePercentage: percentage,
-        feedback: percentage >= 80 ? "Great job! You know your concepts! 🚀" : "Keep learning and practicing! 💪",
-        correctOptions: correctMap
-    };
-}
-
-// Display Results
-function displayResults(result) {
-    quizScreen.classList.add('hidden');
-    resultScreen.classList.remove('hidden');
-    resultScreen.classList.add('fade-in');
-
-    scorePercentageEl.textContent = `${result.scorePercentage}%`;
-    correctAnswersStatEl.textContent = result.correctAnswers;
-    totalQuestionsStatEl.textContent = result.totalQuestions;
-    feedbackTextEl.textContent = result.feedback;
-
-    if (result.scorePercentage >= 80) {
-        feedbackTitleEl.textContent = "🎉 Excellent Performance!";
-    } else if (result.scorePercentage >= 50) {
-        feedbackTitleEl.textContent = "👍 Good Job!";
     } else {
-        feedbackTitleEl.textContent = "📚 Keep Practicing!";
+
+        submitQuiz();
+
     }
-
-    // Animate circular progress ring (Circumference = 2 * PI * 50 = ~314)
-    const offset = 314 - (314 * result.scorePercentage) / 100;
-    setTimeout(() => {
-        scoreRingProgressEl.style.strokeDashoffset = offset;
-    }, 100);
-
-    // Build Review List
-    reviewContainerEl.innerHTML = '';
-    questions.forEach((q, index) => {
-        const userChoiceIdx = userAnswers[q.id];
-        const correctChoiceIdx = result.correctOptions ? result.correctOptions[q.id] : undefined;
-        const isCorrect = userChoiceIdx !== undefined && userChoiceIdx === correctChoiceIdx;
-
-        const userChoiceText = userChoiceIdx !== undefined ? q.options[userChoiceIdx] : "Unanswered";
-        const correctChoiceText = correctChoiceIdx !== undefined ? q.options[correctChoiceIdx] : "N/A";
-
-        const item = document.createElement('div');
-        item.className = 'review-item';
-        item.innerHTML = `
-            <div class="review-question">${index + 1}. ${q.question}</div>
-            <div class="review-answers">
-                <div class="ans-your ${isCorrect ? 'correct' : 'incorrect'}">
-                    <strong>Your Answer:</strong> ${userChoiceText} ${isCorrect ? '✓' : '✗'}
-                </div>
-                ${!isCorrect ? `<div class="ans-correct"><strong>Correct Answer:</strong> ${correctChoiceText}</div>` : ''}
-            </div>
-        `;
-        reviewContainerEl.appendChild(item);
-    });
 }
 
-// Event Listeners
-startBtn.addEventListener('click', startQuiz);
-prevBtn.addEventListener('click', prevQuestion);
-nextBtn.addEventListener('click', nextQuestion);
-submitBtn.addEventListener('click', submitQuiz);
-restartBtn.addEventListener('click', startQuiz);
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', loadQuestions);
+/* ==============================
+   SUBMIT QUIZ
+============================== */
+
+async function submitQuiz() {
+
+    try {
+
+        const response = await fetch(
+            "/api/submit",
+            {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body:
+                    JSON.stringify(userAnswers)
+
+            }
+        );
+
+
+        const result =
+            await response.json();
+
+
+        showResult(result);
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Unable to submit the quiz."
+        );
+    }
+}
+
+
+/* ==============================
+   SHOW RESULT
+============================== */
+
+function showResult(result) {
+
+    document.getElementById(
+        "scoreText"
+    ).textContent =
+        `${result.correctAnswers}/${result.totalQuestions}`;
+
+
+    document.getElementById(
+        "correctAnswers"
+    ).textContent =
+        result.correctAnswers;
+
+
+    document.getElementById(
+        "wrongAnswers"
+    ).textContent =
+        result.wrongAnswers;
+
+
+    document.getElementById(
+        "percentage"
+    ).textContent =
+        `${Math.round(result.percentage)}%`;
+
+
+    let message;
+
+
+    if (result.percentage >= 80) {
+
+        message =
+            "Excellent performance!";
+
+    } else if (result.percentage >= 60) {
+
+        message =
+            "Good job! Keep improving.";
+
+    } else if (result.percentage >= 40) {
+
+        message =
+            "Not bad. A little more practice will help.";
+
+    } else {
+
+        message =
+            "Keep practicing and try again!";
+
+    }
+
+
+    document.getElementById(
+        "performanceText"
+    ).textContent =
+        message;
+
+
+    showScreen("resultScreen");
+}
+
+
+/* ==============================
+   RESTART QUIZ
+============================== */
+
+function restartQuiz() {
+
+    startQuiz(currentCategory);
+
+}
+
+
+/* ==============================
+   GO HOME
+============================== */
+
+function goHome() {
+
+    showScreen("homeScreen");
+
+}
+
+
+/* ==============================
+   SCREEN MANAGEMENT
+============================== */
+
+function showScreen(screenId) {
+
+    const screens =
+        document.querySelectorAll(
+            ".screen"
+        );
+
+
+    screens.forEach(screen => {
+
+        screen.classList.remove(
+            "active"
+        );
+
+    });
+
+
+    document.getElementById(
+        screenId
+    ).classList.add("active");
+
+}
