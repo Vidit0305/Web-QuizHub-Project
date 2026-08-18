@@ -1,42 +1,59 @@
 package com.quizhub.model;
 
-import java.util.List;
-
 public class QuestionResponse {
+
     private int id;
+    private String category;
     private String question;
-    private List<String> options;
 
-    public QuestionResponse() {
-    }
+    private String optionA;
+    private String optionB;
+    private String optionC;
+    private String optionD;
 
-    public QuestionResponse(int id, String question, List<String> options) {
+    public QuestionResponse(
+            int id,
+            String category,
+            String question,
+            String optionA,
+            String optionB,
+            String optionC,
+            String optionD) {
+
         this.id = id;
+        this.category = category;
         this.question = question;
-        this.options = options;
+        this.optionA = optionA;
+        this.optionB = optionB;
+        this.optionC = optionC;
+        this.optionD = optionD;
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public String getCategory() {
+        return category;
     }
 
     public String getQuestion() {
         return question;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
+    public String getOptionA() {
+        return optionA;
     }
 
-    public List<String> getOptions() {
-        return options;
+    public String getOptionB() {
+        return optionB;
     }
 
-    public void setOptions(List<String> options) {
-        this.options = options;
+    public String getOptionC() {
+        return optionC;
+    }
+
+    public String getOptionD() {
+        return optionD;
     }
 }
