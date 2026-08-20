@@ -25,4 +25,34 @@ public class QuestionResponse{
     this.optionC = optionC;
     this.optionD = optionD;
         }
+
+    //getters
+
+    public int getId() {
+        return this.id;
+    }
+
+    public String getCategory() {
+        return this.category;
+    }
+
+    public String getQuestion() {
+        return this.question;
+    }
+
+    public String getOptionA() {
+        return this.optionA;
+    }
+
+    public String getOptionB() {
+        return this.optionB;
+    }
+
+    public String getOptionC() {
+        return this.optionC;
+    }
+
+    public String getOptionD() {
+        return this.optionD;
+    }
 }
