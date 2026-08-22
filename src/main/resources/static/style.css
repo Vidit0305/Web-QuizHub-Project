@@ -5,9 +5,9 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: white;
-    color: #111111;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f7f8fa;
+    color: #171717;
     min-height: 100vh;
 
     display: flex;
@@ -16,97 +16,213 @@ body {
 }
 
 .container {
-    width: 90%;
-    max-width: 600px;
+    width: 92%;
+    max-width: 680px;
     text-align: center;
 }
 
+/* =========================
+   HEADER
+========================= */
+
 h1 {
-    font-size: 40px;
-    font-weight: bold;
-    margin-bottom: 10px;
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
 }
 
 .subtitle {
-    font-size: 18px;
-    margin-bottom: 30px;
+    color: #6b7280;
+    font-size: 16px;
+    margin-bottom: 32px;
 }
+
+/* =========================
+   MAIN CARDS
+========================= */
 
 #start-screen,
 #quiz-screen,
 #result-screen {
-    border: 1px solid #dddddd;
-    border-radius: 10px;
-    padding: 30px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
 }
 
+/* =========================
+   START SCREEN
+========================= */
+
 #start-screen p {
-    font-size: 18px;
-    margin-bottom: 20px;
+    color: #555;
+    font-size: 16px;
+    margin-bottom: 24px;
 }
+
+/* =========================
+   BUTTONS
+========================= */
 
 button {
     border: none;
-    border-radius: 6px;
-    padding: 12px 20px;
-    font-size: 16px;
-    font-weight: bold;
+    border-radius: 8px;
+    padding: 12px 22px;
+
+    font-size: 15px;
+    font-weight: 600;
+
     cursor: pointer;
-    background-color: #111111;
+
+    background: #2563eb;
     color: white;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 button:hover {
-    opacity: 0.8;
+    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(37, 99, 235, 0.2);
 }
 
+button:active {
+    transform: translateY(0);
+}
+
+/* =========================
+   QUESTION SCREEN
+========================= */
+
 #question-number {
+    color: #2563eb;
     font-size: 14px;
-    font-weight: bold;
-    margin-bottom: 15px;
+    font-weight: 600;
+    margin-bottom: 14px;
 }
 
 #question-text {
-    font-size: 22px;
-    margin-bottom: 25px;
+    font-size: 24px;
+    line-height: 1.4;
+    font-weight: 700;
+    margin-bottom: 28px;
 }
+
+/* =========================
+   OPTIONS
+========================= */
 
 #options {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 24px;
 }
 
 .option {
     width: 100%;
-    background-color: white;
-    color: #111111;
-    border: 1px solid #cccccc;
+
+    background: white;
+    color: #222;
+
+    border: 1px solid #e1e4e8;
+
+    padding: 15px 18px;
+
     text-align: left;
+
+    border-radius: 10px;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
 }
 
 .option:hover {
-    background-color: #f5f5f5;
+    background: #f8faff;
+    border-color: #2563eb;
+    color: #2563eb;
+
+    transform: translateY(-1px);
+
+    box-shadow: none;
 }
 
+/* Selected answer */
+
 .option.selected {
-    background-color: #111111;
-    color: white;
+    background: #eff6ff;
+    border-color: #2563eb;
+    color: #1d4ed8;
+}
+
+/* =========================
+   NEXT BUTTON
+========================= */
+
+#next-button {
+    min-width: 110px;
 }
 
 #next-button:disabled {
-    opacity: 0.4;
+    background: #d1d5db;
+    color: #6b7280;
     cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* =========================
+   RESULT SCREEN
+========================= */
+
+#result-screen h2 {
+    font-size: 26px;
+    margin-bottom: 10px;
 }
 
 #score-text {
-    font-size: 28px;
-    font-weight: bold;
-    margin: 20px 0 10px;
+    font-size: 30px;
+    font-weight: 700;
+    color: #2563eb;
+
+    margin: 22px 0 8px;
 }
 
 #correct-text {
-    font-size: 18px;
-    margin-bottom: 25px;
+    color: #6b7280;
+    font-size: 16px;
+
+    margin-bottom: 28px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 600px) {
+
+    .container {
+        width: 94%;
+    }
+
+    #start-screen,
+    #quiz-screen,
+    #result-screen {
+        padding: 28px 20px;
+    }
+
+    h1 {
+        font-size: 32px;
+    }
+
+    #question-text {
+        font-size: 21px;
+    }
 }
