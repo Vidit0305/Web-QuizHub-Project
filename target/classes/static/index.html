@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>QuizHub</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>QuizHub</h1>
+
+        <p class="subtitle">Test Your Java Knowledge</p>
+
+
+        <div id="start-screen">
+
+            <p>Ready to test your Java basics?</p>
+
+            <button onclick="startQuiz()">Start Quiz</button>
+
+        </div>
+
+
+        <div id="quiz-screen" style="display: none;">
+
+            <p id="question-number"></p>
+
+            <h2 id="question-text"></h2>
+
+
+            <div id="options">
+
+                <button class="option" onclick="selectAnswer('A')" id="optionA"></button>
+
+                <button class="option" onclick="selectAnswer('B')" id="optionB"></button>
+
+                <button class="option" onclick="selectAnswer('C')" id="optionC"></button>
+
+                <button class="option" onclick="selectAnswer('D')" id="optionD"></button>
+
+            </div>
+
+
+            <button id="next-button" onclick="nextQuestion()" disabled>
+                Next
+            </button>
+
+        </div>
+
+
+        <div id="result-screen" style="display: none;">
+
+            <h2>Quiz Completed!</h2>
+
+            <p id="score-text"></p>
+
+            <p id="correct-text"></p>
+
+            <button onclick="restartQuiz()">Restart Quiz</button>
+
+        </div>
+
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

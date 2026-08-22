@@ -9,7 +9,7 @@ public class QuestionResponse{
     private String optionD;
 
     public QuestionResponse(
-        int id;
+        int id,
         String category,
         String question,
         String optionA,
@@ -17,14 +17,14 @@ public class QuestionResponse{
         String optionC,
         String optionD){
 
-    this.id = id;
-    ths.category = category;
-    this.question = question;
-    this.optionA = optionA;
-    this.optionB = optionB;
-    this.optionC = optionC;
-    this.optionD = optionD;
-        }
+        this.id = id;
+        this.category = category;
+        this.question = question;
+        this.optionA = optionA;
+        this.optionB = optionB;
+        this.optionC = optionC;
+        this.optionD = optionD;
+    }
 
     //getters
 

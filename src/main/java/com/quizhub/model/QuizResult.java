@@ -4,7 +4,7 @@ public class QuizResult {
 
     private int totalQuestions;
 
-    private int correctAnswer;
+    private int correctAnswers;
 
     private int score;
 

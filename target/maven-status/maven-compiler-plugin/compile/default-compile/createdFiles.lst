@@ -1,0 +1,7 @@
+com\quizhub\model\QuizResult.class
+com\quizhub\QuizHubApplication.class
+com\quizhub\model\AnswerRequest.class
+com\quizhub\service\QuizService.class
+com\quizhub\controller\QuizController.class
+com\quizhub\model\Question.class
+com\quizhub\model\QuestionResponse.class
