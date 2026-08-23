@@ -1,144 +1,112 @@
 let questions = [];
-
 let currentQuestion = 0;
-
 let selectedAnswer = null;
-
 let userAnswers = [];
 
-
 async function startQuiz() {
+    try {
+        const response = await fetch("/api/quiz/questions");
+        questions = await response.json();
 
-    const response = await fetch("/api/quiz/questions");
+        currentQuestion = 0;
+        userAnswers = [];
+        selectedAnswer = null;
 
-    questions = await response.json();
-
-    document.getElementById("start-screen").style.display = "none";
-
-    document.getElementById("quiz-screen").style.display = "block";
-
-    showQuestion();
-}
-
-
-function showQuestion() {
-
-    const question = questions[currentQuestion];
-
-    document.getElementById("question-number").textContent =
-        "Question " + (currentQuestion + 1) + " of " + questions.length;
-
-    document.getElementById("question-text").textContent =
-        question.question;
-
-    document.getElementById("optionA").textContent =
-        "A. " + question.optionA;
-
-    document.getElementById("optionB").textContent =
-        "B. " + question.optionB;
-
-    document.getElementById("optionC").textContent =
-        "C. " + question.optionC;
-
-    document.getElementById("optionD").textContent =
-        "D. " + question.optionD;
-
-    selectedAnswer = null;
-
-    document.getElementById("next-button").disabled = true;
-
-    document.querySelectorAll(".option").forEach(function (button) {
-
-        button.classList.remove("selected");
-
-    });
-}
-
-
-function selectAnswer(answer) {
-
-    selectedAnswer = answer;
-
-    document.querySelectorAll(".option").forEach(function (button) {
-
-        button.classList.remove("selected");
-
-    });
-
-    document.getElementById("option" + answer)
-        .classList.add("selected");
-
-    document.getElementById("next-button").disabled = false;
-}
-
-
-function nextQuestion() {
-
-    userAnswers.push({
-
-        questionId: questions[currentQuestion].id,
-
-        selectedAnswer: selectedAnswer
-
-    });
-
-
-    currentQuestion++;
-
-
-    if (currentQuestion < questions.length) {
+        document.getElementById("start-screen").style.display = "none";
+        document.getElementById("result-screen").style.display = "none";
+        document.getElementById("quiz-screen").style.display = "block";
 
         showQuestion();
-
-    } else {
-
-        submitQuiz();
-
+    } catch (error) {
+        console.error("Error loading questions:", error);
     }
 }
 
+function showQuestion() {
+    const question = questions[currentQuestion];
 
-async function submitQuiz() {
+    // Update Question Badge & Text
+    document.getElementById("question-number").textContent =
+        "QUESTION " + (currentQuestion + 1) + " OF " + questions.length;
+    document.getElementById("question-text").textContent = question.question;
 
-    const response = await fetch("/api/quiz/submit", {
+    // Update Progress Bar
+    const progressPercent = ((currentQuestion + 1) / questions.length) * 100;
+    document.getElementById("progress-bar").style.width = progressPercent + "%";
 
-        method: "POST",
+    // Populate Option Texts
+    document.getElementById("optionA-text").textContent = question.optionA;
+    document.getElementById("optionB-text").textContent = question.optionB;
+    document.getElementById("optionC-text").textContent = question.optionC;
+    document.getElementById("optionD-text").textContent = question.optionD;
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+    // Reset Selection & Next Button
+    selectedAnswer = null;
+    document.getElementById("next-button").disabled = true;
 
-        body: JSON.stringify(userAnswers)
-
-    });
-
-
-    const result = await response.json();
-
-    document.getElementById("quiz-screen").style.display = "none";
-
-    document.getElementById("result-screen").style.display = "block";
-
-    document.getElementById("score-text").textContent =
-        "Score: " + result.score + " / 100";
-
-    document.getElementById("correct-text").textContent =
-        "Correct Answers: " +
-        result.correctAnswers +
-        " / " +
-        result.totalQuestions;
+    const optionCards = document.querySelectorAll(".option-card");
+    for (let i = 0; i < optionCards.length; i++) {
+        optionCards[i].classList.remove("selected");
+    }
 }
 
+function selectAnswer(answer) {
+    selectedAnswer = answer;
+
+    // Clear previous selection
+    const optionCards = document.querySelectorAll(".option-card");
+    for (let i = 0; i < optionCards.length; i++) {
+        optionCards[i].classList.remove("selected");
+    }
+
+    // Mark clicked option as selected
+    document.getElementById("option" + answer).classList.add("selected");
+    document.getElementById("next-button").disabled = false;
+}
+
+function nextQuestion() {
+    userAnswers.push({
+        questionId: questions[currentQuestion].id,
+        selectedAnswer: selectedAnswer
+    });
+
+    currentQuestion++;
+
+    if (currentQuestion < questions.length) {
+        showQuestion();
+    } else {
+        submitQuiz();
+    }
+}
+
+async function submitQuiz() {
+    try {
+        const response = await fetch("/api/quiz/submit", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(userAnswers)
+        });
+
+        const result = await response.json();
+
+        document.getElementById("quiz-screen").style.display = "none";
+        document.getElementById("result-screen").style.display = "block";
+
+        document.getElementById("score-text").textContent = result.score + "%";
+        document.getElementById("correct-text").textContent =
+            "You answered " + result.correctAnswers + " out of " + result.totalQuestions + " questions correctly.";
+    } catch (error) {
+        console.error("Error submitting quiz:", error);
+    }
+}
 
 function restartQuiz() {
-
     currentQuestion = 0;
-
     selectedAnswer = null;
-
     userAnswers = [];
 
     document.getElementById("result-screen").style.display = "none";
-
     document.getElementById("start-screen").style.display = "block";
 }
