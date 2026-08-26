@@ -23,43 +23,37 @@ async function startQuiz() {
 }
 
 function showQuestion() {
-    const question = questions[currentQuestion];
+    const q = questions[currentQuestion];
 
-    // Update Question Badge & Text
     document.getElementById("question-number").textContent =
         "QUESTION " + (currentQuestion + 1) + " OF " + questions.length;
-    document.getElementById("question-text").textContent = question.question;
+    document.getElementById("question-text").textContent = q.question;
 
-    // Update Progress Bar
-    const progressPercent = ((currentQuestion + 1) / questions.length) * 100;
-    document.getElementById("progress-bar").style.width = progressPercent + "%";
+    const progress = ((currentQuestion + 1) / questions.length) * 100;
+    document.getElementById("progress-bar").style.width = progress + "%";
 
-    // Populate Option Texts
-    document.getElementById("optionA-text").textContent = question.optionA;
-    document.getElementById("optionB-text").textContent = question.optionB;
-    document.getElementById("optionC-text").textContent = question.optionC;
-    document.getElementById("optionD-text").textContent = question.optionD;
+    document.getElementById("optionA-text").textContent = q.optionA;
+    document.getElementById("optionB-text").textContent = q.optionB;
+    document.getElementById("optionC-text").textContent = q.optionC;
+    document.getElementById("optionD-text").textContent = q.optionD;
 
-    // Reset Selection & Next Button
     selectedAnswer = null;
     document.getElementById("next-button").disabled = true;
 
-    const optionCards = document.querySelectorAll(".option-card");
-    for (let i = 0; i < optionCards.length; i++) {
-        optionCards[i].classList.remove("selected");
+    const options = document.querySelectorAll(".option-card");
+    for (let i = 0; i < options.length; i++) {
+        options[i].classList.remove("selected");
     }
 }
 
 function selectAnswer(answer) {
     selectedAnswer = answer;
 
-    // Clear previous selection
-    const optionCards = document.querySelectorAll(".option-card");
-    for (let i = 0; i < optionCards.length; i++) {
-        optionCards[i].classList.remove("selected");
+    const options = document.querySelectorAll(".option-card");
+    for (let i = 0; i < options.length; i++) {
+        options[i].classList.remove("selected");
     }
 
-    // Mark clicked option as selected
     document.getElementById("option" + answer).classList.add("selected");
     document.getElementById("next-button").disabled = false;
 }
@@ -83,9 +77,7 @@ async function submitQuiz() {
     try {
         const response = await fetch("/api/quiz/submit", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(userAnswers)
         });
 
@@ -96,7 +88,7 @@ async function submitQuiz() {
 
         document.getElementById("score-text").textContent = result.score + "%";
         document.getElementById("correct-text").textContent =
-            "You answered " + result.correctAnswers + " out of " + result.totalQuestions + " questions correctly.";
+            result.correctAnswers + " out of " + result.totalQuestions + " correct";
     } catch (error) {
         console.error("Error submitting quiz:", error);
     }

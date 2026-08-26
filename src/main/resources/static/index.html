@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizHub - Test Your Java Knowledge</title>
+    <title>QuizHub - Java Quiz</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Simple Top Navbar -->
+    <!-- Navbar -->
     <header class="navbar">
-        <div class="navbar-container">
-            <div class="navbar-brand">
-                <span class="logo-text">QuizHub</span>
-            </div>
-            <div class="navbar-badge">Java Quiz</div>
+        <div class="nav-container">
+            <span class="logo">QuizHub</span>
+            <span class="nav-badge">Java Quiz</span>
         </div>
     </header>
 
@@ -23,23 +21,17 @@
         <div class="container">
 
             <!-- 1. Start Screen -->
-            <div id="start-screen" class="card">
+            <div id="start-screen" class="card text-center">
                 <div class="tag">JAVA QUIZ</div>
-                <h1 class="card-title">Test Your Java Knowledge</h1>
-                <p class="card-description">
-                    Test your understanding of Java basics with a short 5-question quiz.
-                </p>
-
-                <button class="primary-btn start-btn" onclick="startQuiz()">
+                <h1>Test Your Java Knowledge</h1>
+                <p class="description">Test your Java basics with a short 5-question quiz.</p>
+                <button class="btn btn-primary btn-block" onclick="startQuiz()">
                     Start Quiz &rarr;
                 </button>
-
                 <div class="meta-info">
                     <span>5 Questions</span>
                     <span class="dot">&bull;</span>
                     <span>Java Basics</span>
-                    <span class="dot">&bull;</span>
-                    <span>Quick Quiz</span>
                 </div>
             </div>
 
@@ -49,14 +41,12 @@
                     <span class="quiz-badge" id="question-number">QUESTION 1 OF 5</span>
                 </div>
 
-                <!-- Progress Bar -->
                 <div class="progress-track">
                     <div class="progress-fill" id="progress-bar"></div>
                 </div>
 
                 <h2 class="question-title" id="question-text"></h2>
 
-                <!-- Options -->
                 <div class="options-container" id="options">
                     <button class="option-card" onclick="selectAnswer('A')" id="optionA">
                         <span class="option-key">A</span>
@@ -77,26 +67,21 @@
                 </div>
 
                 <div class="quiz-footer">
-                    <button id="next-button" class="primary-btn next-btn" onclick="nextQuestion()" disabled>
+                    <button id="next-button" class="btn btn-primary" onclick="nextQuestion()" disabled>
                         Next Question &rarr;
                     </button>
                 </div>
             </div>
 
             <!-- 3. Result Screen -->
-            <div id="result-screen" class="card" style="display: none;">
+            <div id="result-screen" class="card text-center" style="display: none;">
                 <div class="tag">QUIZ COMPLETED</div>
-                <h2 class="card-title">Great job!</h2>
-
                 <div class="score-box">
                     <span class="score-label">Your Score</span>
                     <div class="score-value" id="score-text">80%</div>
-                    <p class="score-detail" id="correct-text">
-                        You answered 4 out of 5 questions correctly.
-                    </p>
+                    <p class="score-detail" id="correct-text">4 out of 5 correct</p>
                 </div>
-
-                <button class="primary-btn restart-btn" onclick="restartQuiz()">
+                <button class="btn btn-primary btn-block" onclick="restartQuiz()">
                     Try Again
                 </button>
             </div>
