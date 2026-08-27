@@ -4,8 +4,12 @@ let selectedAnswer = null;
 let userAnswers = [];
 
 async function startQuiz() {
+    hideError();
     try {
-        const response = await fetch("/api/quiz/questions");
+        const response = await fetch("/api/questions");
+        if (!response.ok) {
+            throw new Error("HTTP error " + response.status);
+        }
         questions = await response.json();
 
         currentQuestion = 0;
@@ -19,6 +23,7 @@ async function startQuiz() {
         showQuestion();
     } catch (error) {
         console.error("Error loading questions:", error);
+        showError("Unable to connect to the quiz server.");
     }
 }
 
@@ -75,11 +80,15 @@ function nextQuestion() {
 
 async function submitQuiz() {
     try {
-        const response = await fetch("/api/quiz/submit", {
+        const response = await fetch("/api/submit", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(userAnswers)
         });
+
+        if (!response.ok) {
+            throw new Error("HTTP error " + response.status);
+        }
 
         const result = await response.json();
 
@@ -91,6 +100,7 @@ async function submitQuiz() {
             result.correctAnswers + " out of " + result.totalQuestions + " correct";
     } catch (error) {
         console.error("Error submitting quiz:", error);
+        showError("Unable to connect to the quiz server.");
     }
 }
 
@@ -98,7 +108,23 @@ function restartQuiz() {
     currentQuestion = 0;
     selectedAnswer = null;
     userAnswers = [];
+    hideError();
 
     document.getElementById("result-screen").style.display = "none";
     document.getElementById("start-screen").style.display = "block";
+}
+
+function showError(msg) {
+    const errorEl = document.getElementById("error-message");
+    if (errorEl) {
+        errorEl.textContent = msg;
+        errorEl.style.display = "block";
+    }
+}
+
+function hideError() {
+    const errorEl = document.getElementById("error-message");
+    if (errorEl) {
+        errorEl.style.display = "none";
+    }
 }
