@@ -3,47 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizHub - Java Quiz</title>
+    <title>QuizHub - Java Basics</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Navbar -->
+    <!-- Header Navbar -->
     <header class="navbar">
         <div class="nav-container">
             <span class="logo">QuizHub</span>
-            <span class="nav-badge">Java Quiz</span>
+            <span class="nav-badge">Java Basics</span>
         </div>
     </header>
 
     <!-- Main Container -->
-    <main class="main-content">
+    <main class="main-wrapper">
         <div class="container">
 
-            <!-- Error Banner (Shown if connection fails) -->
-            <div id="error-message" class="error-banner" style="display: none;">
-                Unable to connect to the quiz server.
-            </div>
+            <!-- Error Banner -->
+            <div id="error-banner" class="alert-banner" style="display: none;"></div>
 
-            <!-- 1. Start Screen -->
-            <div id="start-screen" class="card text-center">
-                <div class="tag">JAVA QUIZ</div>
-                <h1>Test Your Java Knowledge</h1>
-                <p class="description">Test your Java basics with a short 5-question quiz.</p>
+            <!-- 1. Home / Start Screen -->
+            <section id="start-screen" class="card text-center">
+                <div class="pill-badge">QuizHub</div>
+                <h1 class="card-title">Test Your Java Knowledge</h1>
+                <p class="card-subtitle">
+                    A quick 5-question quiz to test your fundamental understanding of Java basics.
+                </p>
+
+                <div class="info-chips">
+                    <span class="info-chip">5 Questions</span>
+                    <span class="info-chip">Java Basics</span>
+                    <span class="info-chip">Quick Quiz</span>
+                </div>
+
                 <button class="btn btn-primary btn-block" onclick="startQuiz()">
                     Start Quiz &rarr;
                 </button>
-                <div class="meta-info">
-                    <span>5 Questions</span>
-                    <span class="dot">&bull;</span>
-                    <span>Java Basics</span>
-                </div>
-            </div>
+            </section>
 
             <!-- 2. Quiz Screen -->
-            <div id="quiz-screen" class="card" style="display: none;">
+            <section id="quiz-screen" class="card" style="display: none;">
                 <div class="quiz-header">
-                    <span class="quiz-badge" id="question-number">QUESTION 1 OF 5</span>
+                    <span class="question-counter" id="question-number">Question 1 of 5</span>
+                    <span class="category-tag">Java Basics</span>
                 </div>
 
                 <div class="progress-track">
@@ -76,20 +79,23 @@
                         Next Question &rarr;
                     </button>
                 </div>
-            </div>
+            </section>
 
             <!-- 3. Result Screen -->
-            <div id="result-screen" class="card text-center" style="display: none;">
-                <div class="tag">QUIZ COMPLETED</div>
-                <div class="score-box">
-                    <span class="score-label">Your Score</span>
-                    <div class="score-value" id="score-text">80%</div>
-                    <p class="score-detail" id="correct-text">4 out of 5 correct</p>
+            <section id="result-screen" class="card text-center" style="display: none;">
+                <div class="pill-badge">Quiz Complete</div>
+                <h1 class="card-title">Quiz Result</h1>
+
+                <div class="score-card">
+                    <div class="score-fraction" id="score-fraction">4 / 5</div>
+                    <div class="score-percentage" id="score-text">80%</div>
+                    <p class="score-message" id="score-message">Great job! You have a solid grasp of Java basics.</p>
                 </div>
+
                 <button class="btn btn-primary btn-block" onclick="restartQuiz()">
                     Try Again
                 </button>
-            </div>
+            </section>
 
         </div>
     </main>

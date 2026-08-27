@@ -1,6 +1,30 @@
 /* =========================================
-   1. Base & Reset
+   1. CSS Variables & Reset
    ========================================= */
+:root {
+    --bg-page: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-hover: #f1f5f9;
+    --bg-accent-light: #eff6ff;
+    
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    
+    --border-color: #e2e8f0;
+    --border-focus: #93c5fd;
+    
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-pill: 9999px;
+    
+    --shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -8,25 +32,27 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f7f8fc;
-    color: #111827;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    line-height: 1.5;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    -webkit-font-smoothing: antialiased;
 }
 
 /* =========================================
    2. Navbar
    ========================================= */
 .navbar {
-    background-color: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
     padding: 14px 20px;
 }
 
 .nav-container {
-    max-width: 600px;
+    max-width: 580px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
@@ -36,24 +62,24 @@ body {
 .logo {
     font-size: 18px;
     font-weight: 700;
-    color: #111827;
     letter-spacing: -0.3px;
+    color: var(--text-primary);
 }
 
 .nav-badge {
     font-size: 12px;
     font-weight: 600;
-    color: #2563eb;
-    background-color: #eff6ff;
+    color: var(--primary);
+    background-color: var(--bg-accent-light);
     border: 1px solid #dbeafe;
     padding: 4px 10px;
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
 }
 
 /* =========================================
-   3. Layout, Cards & Error Banner
+   3. Layout & Cards
    ========================================= */
-.main-content {
+.main-wrapper {
     flex: 1;
     display: flex;
     justify-content: center;
@@ -67,72 +93,68 @@ body {
 }
 
 .card {
-    background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 32px 28px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 36px 32px;
+    box-shadow: var(--shadow);
 }
 
 .text-center {
     text-align: center;
 }
 
-.error-banner {
-    background-color: #fef2f2;
-    color: #dc2626;
-    border: 1px solid #fecaca;
-    border-radius: 8px;
-    padding: 12px 16px;
-    font-size: 14px;
-    font-weight: 500;
-    text-align: center;
-    margin-bottom: 16px;
-}
-
-.tag {
+/* =========================================
+   4. Typography & Badges
+   ========================================= */
+.pill-badge {
     display: inline-block;
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: 0.5px;
-    color: #2563eb;
-    background-color: #eff6ff;
-    padding: 4px 10px;
-    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--primary);
+    background-color: var(--bg-accent-light);
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
     margin-bottom: 14px;
 }
 
-h1 {
+.card-title {
     font-size: 24px;
     font-weight: 700;
-    color: #111827;
-    margin-bottom: 8px;
+    color: var(--text-primary);
+    letter-spacing: -0.4px;
+    margin-bottom: 10px;
 }
 
-.description {
+.card-subtitle {
     font-size: 15px;
-    color: #6b7280;
-    line-height: 1.5;
+    color: var(--text-secondary);
+    line-height: 1.6;
     margin-bottom: 24px;
 }
 
-.meta-info {
+.info-chips {
     display: flex;
     justify-content: center;
-    align-items: center;
     gap: 8px;
-    margin-top: 20px;
-    font-size: 13px;
-    color: #6b7280;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
 }
 
-.meta-info .dot {
-    color: #d1d5db;
-    font-size: 10px;
+.info-chip {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background-color: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
 }
 
 /* =========================================
-   4. Buttons
+   5. Buttons
    ========================================= */
 .btn {
     display: inline-flex;
@@ -143,23 +165,27 @@ h1 {
     font-weight: 600;
     padding: 12px 24px;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: background-color 0.15s ease;
+    transition: background-color 0.15s ease, transform 0.05s ease;
+}
+
+.btn:active:not(:disabled) {
+    transform: scale(0.99);
 }
 
 .btn-primary {
-    background-color: #2563eb;
+    background-color: var(--primary);
     color: #ffffff;
 }
 
 .btn-primary:hover:not(:disabled) {
-    background-color: #1d4ed8;
+    background-color: var(--primary-hover);
 }
 
 .btn:disabled {
-    background-color: #e5e7eb;
-    color: #9ca3af;
+    background-color: #e2e8f0;
+    color: #94a3b8;
     cursor: not-allowed;
 }
 
@@ -168,40 +194,50 @@ h1 {
 }
 
 /* =========================================
-   5. Quiz Screen & Options
+   6. Quiz Screen & Options
    ========================================= */
 .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 12px;
 }
 
-.quiz-badge {
-    font-size: 12px;
+.question-counter {
+    font-size: 13px;
     font-weight: 700;
-    color: #2563eb;
+    color: var(--primary);
+    text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+.category-tag {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
 }
 
 .progress-track {
     width: 100%;
     height: 6px;
-    background-color: #e5e7eb;
-    border-radius: 9999px;
+    background-color: #e2e8f0;
+    border-radius: var(--radius-pill);
     overflow: hidden;
-    margin-bottom: 22px;
+    margin-bottom: 24px;
 }
 
 .progress-fill {
     height: 100%;
-    background-color: #2563eb;
-    border-radius: 9999px;
-    transition: width 0.3s ease;
+    background-color: var(--primary);
+    border-radius: var(--radius-pill);
+    transition: width 0.25s ease-out;
 }
 
 .question-title {
-    font-size: 20px;
-    font-weight: 700;
-    line-height: 1.4;
-    color: #111827;
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--text-primary);
     margin-bottom: 22px;
 }
 
@@ -216,10 +252,10 @@ h1 {
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 12px;
-    background-color: #ffffff;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 10px;
+    gap: 14px;
+    background-color: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-md);
     padding: 12px 16px;
     text-align: left;
     cursor: pointer;
@@ -234,41 +270,41 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f3f4f6;
-    color: #4b5563;
+    background-color: #f1f5f9;
+    color: var(--text-secondary);
     font-size: 13px;
     font-weight: 700;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
 }
 
 .option-text {
     font-size: 15px;
-    color: #374151;
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
 .option-card:hover {
-    border-color: #93c5fd;
-    background-color: #f9fafb;
+    border-color: var(--border-focus);
+    background-color: var(--bg-hover);
 }
 
 .option-card:hover .option-key {
-    background-color: #eff6ff;
-    color: #2563eb;
+    background-color: var(--bg-accent-light);
+    color: var(--primary);
 }
 
 .option-card.selected {
-    border-color: #2563eb;
-    background-color: #eff6ff;
+    border-color: var(--primary);
+    background-color: var(--bg-accent-light);
 }
 
 .option-card.selected .option-key {
-    background-color: #2563eb;
+    background-color: var(--primary);
     color: #ffffff;
 }
 
 .option-card.selected .option-text {
-    color: #1e40af;
+    color: var(--primary-hover);
     font-weight: 600;
 }
 
@@ -278,57 +314,68 @@ h1 {
 }
 
 /* =========================================
-   6. Result Screen
+   7. Result Screen
    ========================================= */
-.score-box {
-    margin: 20px 0 24px;
-    padding: 20px;
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
+.score-card {
+    margin: 20px 0 28px;
+    padding: 24px 20px;
+    background-color: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
 }
 
-.score-label {
-    display: block;
-    font-size: 12px;
+.score-fraction {
+    font-size: 15px;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #6b7280;
-    margin-bottom: 6px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
 }
 
-.score-value {
-    font-size: 38px;
+.score-percentage {
+    font-size: 42px;
     font-weight: 800;
-    color: #2563eb;
+    color: var(--primary);
+    letter-spacing: -0.5px;
     line-height: 1.1;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
-.score-detail {
+.score-message {
     font-size: 14px;
-    color: #6b7280;
+    color: var(--text-secondary);
+    font-weight: 500;
 }
 
 /* =========================================
-   7. Responsive
+   8. Alert Banner & Responsive
    ========================================= */
+.alert-banner {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
 @media (max-width: 600px) {
-    .main-content {
+    .main-wrapper {
         padding: 20px 14px;
     }
 
     .card {
-        padding: 24px 18px;
+        padding: 28px 20px;
     }
 
-    h1 {
+    .card-title {
         font-size: 20px;
     }
 
     .question-title {
-        font-size: 18px;
+        font-size: 17px;
     }
 
     .quiz-footer .btn {

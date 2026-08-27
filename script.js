@@ -1,84 +1,90 @@
+// State variables
 let questions = [];
-let currentQuestion = 0;
+let currentIndex = 0;
 let selectedAnswer = null;
 let userAnswers = [];
 
+// Start Quiz: fetch questions from backend and initialize state
 async function startQuiz() {
     hideError();
     try {
         const response = await fetch("/api/questions");
         if (!response.ok) {
-            throw new Error("HTTP error " + response.status);
+            throw new Error("Failed to load questions: " + response.status);
         }
         questions = await response.json();
 
-        currentQuestion = 0;
-        userAnswers = [];
+        currentIndex = 0;
         selectedAnswer = null;
+        userAnswers = [];
 
         document.getElementById("start-screen").style.display = "none";
         document.getElementById("result-screen").style.display = "none";
         document.getElementById("quiz-screen").style.display = "block";
 
-        showQuestion();
+        renderQuestion();
     } catch (error) {
-        console.error("Error loading questions:", error);
-        showError("Unable to connect to the quiz server.");
+        console.error("Error starting quiz:", error);
+        showError("Unable to connect to the quiz server. Please ensure the server is running.");
     }
 }
 
-function showQuestion() {
-    const q = questions[currentQuestion];
+// Render the current question and options
+function renderQuestion() {
+    const q = questions[currentIndex];
 
     document.getElementById("question-number").textContent =
-        "QUESTION " + (currentQuestion + 1) + " OF " + questions.length;
-    document.getElementById("question-text").textContent = q.question;
+        "Question " + (currentIndex + 1) + " of " + questions.length;
 
-    const progress = ((currentQuestion + 1) / questions.length) * 100;
+    const progress = ((currentIndex + 1) / questions.length) * 100;
     document.getElementById("progress-bar").style.width = progress + "%";
 
+    document.getElementById("question-text").textContent = q.question;
     document.getElementById("optionA-text").textContent = q.optionA;
     document.getElementById("optionB-text").textContent = q.optionB;
     document.getElementById("optionC-text").textContent = q.optionC;
     document.getElementById("optionD-text").textContent = q.optionD;
 
+    // Reset selection and button state
     selectedAnswer = null;
     document.getElementById("next-button").disabled = true;
 
     const options = document.querySelectorAll(".option-card");
-    for (let i = 0; i < options.length; i++) {
-        options[i].classList.remove("selected");
-    }
+    options.forEach(option => option.classList.remove("selected"));
 }
 
-function selectAnswer(answer) {
-    selectedAnswer = answer;
+// Handle option selection
+function selectAnswer(option) {
+    selectedAnswer = option;
 
     const options = document.querySelectorAll(".option-card");
-    for (let i = 0; i < options.length; i++) {
-        options[i].classList.remove("selected");
-    }
+    options.forEach(card => card.classList.remove("selected"));
 
-    document.getElementById("option" + answer).classList.add("selected");
+    document.getElementById("option" + option).classList.add("selected");
     document.getElementById("next-button").disabled = false;
 }
 
+// Move to next question or submit if final question reached
 function nextQuestion() {
+    if (!selectedAnswer) return;
+
     userAnswers.push({
-        questionId: questions[currentQuestion].id,
+        questionId: questions[currentIndex].id,
         selectedAnswer: selectedAnswer
     });
 
-    currentQuestion++;
+    currentIndex++;
 
-    if (currentQuestion < questions.length) {
-        showQuestion();
+    if (currentIndex < questions.length) {
+        renderQuestion();
     } else {
         submitQuiz();
     }
 }
 
+// Submit answers to Java backend and display results
 async function submitQuiz() {
+    hideError();
     try {
         const response = await fetch("/api/submit", {
             method: "POST",
@@ -87,7 +93,7 @@ async function submitQuiz() {
         });
 
         if (!response.ok) {
-            throw new Error("HTTP error " + response.status);
+            throw new Error("Failed to submit quiz: " + response.status);
         }
 
         const result = await response.json();
@@ -95,17 +101,32 @@ async function submitQuiz() {
         document.getElementById("quiz-screen").style.display = "none";
         document.getElementById("result-screen").style.display = "block";
 
+        document.getElementById("score-fraction").textContent =
+            result.correctAnswers + " / " + result.totalQuestions;
         document.getElementById("score-text").textContent = result.score + "%";
-        document.getElementById("correct-text").textContent =
-            result.correctAnswers + " out of " + result.totalQuestions + " correct";
+        document.getElementById("score-message").textContent = getFeedbackMessage(result.score);
     } catch (error) {
         console.error("Error submitting quiz:", error);
-        showError("Unable to connect to the quiz server.");
+        showError("Unable to submit quiz. Please check your connection to the server.");
     }
 }
 
+// Generate score feedback message
+function getFeedbackMessage(score) {
+    if (score === 100) {
+        return "Perfect score! Outstanding Java knowledge.";
+    } else if (score >= 80) {
+        return "Great job! You have a solid grasp of Java basics.";
+    } else if (score >= 60) {
+        return "Good effort! Keep practicing to sharpen your skills.";
+    } else {
+        return "Keep learning! Review Java basics and try again.";
+    }
+}
+
+// Restart quiz from result screen
 function restartQuiz() {
-    currentQuestion = 0;
+    currentIndex = 0;
     selectedAnswer = null;
     userAnswers = [];
     hideError();
@@ -114,17 +135,18 @@ function restartQuiz() {
     document.getElementById("start-screen").style.display = "block";
 }
 
-function showError(msg) {
-    const errorEl = document.getElementById("error-message");
-    if (errorEl) {
-        errorEl.textContent = msg;
-        errorEl.style.display = "block";
+// Error UI helpers
+function showError(message) {
+    const banner = document.getElementById("error-banner");
+    if (banner) {
+        banner.textContent = message;
+        banner.style.display = "block";
     }
 }
 
 function hideError() {
-    const errorEl = document.getElementById("error-message");
-    if (errorEl) {
-        errorEl.style.display = "none";
+    const banner = document.getElementById("error-banner");
+    if (banner) {
+        banner.style.display = "none";
     }
 }
