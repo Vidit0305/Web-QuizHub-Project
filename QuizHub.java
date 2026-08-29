@@ -2,99 +2,124 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
-import java.util.Scanner;
+import java.nio.file.Path;
 
-public class QuizHub {
+public class QuizHub implements HttpHandler {
 
-    private static final int PORT = 8080;
-    private static QuizController quizController = new QuizController();
+    static QuizController quiz = new QuizController();
+
 
     public static void main(String[] args) throws IOException {
-        HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
 
-        // API routes
-        server.createContext("/api/questions", new QuestionsHandler());
-        server.createContext("/api/submit", new SubmitHandler());
+        HttpServer server = HttpServer.create(
+                new InetSocketAddress(8080), 0
+        );
 
-        // Static files routes (index.html, style.css, script.js)
-        server.createContext("/", new StaticFileHandler());
+        server.createContext("/", new QuizHub());
 
-        server.setExecutor(null);
         server.start();
 
-        System.out.println("QuizHub server started at http://localhost:" + PORT);
+        System.out.println("QuizHub is running at http://localhost:8080");
     }
 
-    // Handles GET /api/questions
-    static class QuestionsHandler implements HttpHandler {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
-                String response = quizController.getQuestionsJson();
-                sendResponse(exchange, 200, "application/json", response.getBytes());
-            } else {
-                sendResponse(exchange, 405, "text/plain", "Method Not Allowed".getBytes());
-            }
+
+    public void handle(HttpExchange exchange) throws IOException {
+
+        String path = exchange.getRequestURI().getPath();
+        String method = exchange.getRequestMethod();
+
+
+        if (path.equals("/api/questions") && method.equals("GET")) {
+
+            send(exchange, quiz.getQuestions(), "application/json");
+
+        }
+
+        else if (path.equals("/api/submit") && method.equals("POST")) {
+
+            String answers = new String(
+                    exchange.getRequestBody().readAllBytes()
+            );
+
+            send(exchange, quiz.checkAnswers(answers), "application/json");
+
+        }
+
+        else {
+
+            showFile(exchange, path);
         }
     }
 
-    // Handles POST /api/submit
-    static class SubmitHandler implements HttpHandler {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
-                Scanner scanner = new Scanner(exchange.getRequestBody()).useDelimiter("\\A");
-                String requestBody = scanner.hasNext() ? scanner.next() : "";
-                String response = quizController.calculateResultJson(requestBody);
-                sendResponse(exchange, 200, "application/json", response.getBytes());
-            } else {
-                sendResponse(exchange, 405, "text/plain", "Method Not Allowed".getBytes());
+
+    static void showFile(HttpExchange exchange, String path)
+            throws IOException {
+
+        if (path.equals("/")) {
+            path = "/index.html";
+        }
+
+        Path file = Path.of("." + path);
+
+        if (Files.exists(file)) {
+
+            byte[] data = Files.readAllBytes(file);
+
+            String type = "text/plain";
+
+            if (path.endsWith(".html")) {
+                type = "text/html";
             }
+
+            else if (path.endsWith(".css")) {
+                type = "text/css";
+            }
+
+            else if (path.endsWith(".js")) {
+                type = "text/javascript";
+            }
+
+            send(exchange, data, type);
+        }
+
+        else {
+
+            send(exchange, "File not found", "text/plain");
         }
     }
 
-    // Serves index.html, style.css, script.js from current directory
-    static class StaticFileHandler implements HttpHandler {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            String path = exchange.getRequestURI().getPath();
-            if ("/".equals(path) || "".equals(path)) {
-                path = "/index.html";
-            }
 
-            File file = new File("." + path);
-            if (file.exists() && !file.isDirectory()) {
-                String contentType = getContentType(path);
-                byte[] bytes = Files.readAllBytes(file.toPath());
-                sendResponse(exchange, 200, contentType, bytes);
-            } else {
-                sendResponse(exchange, 404, "text/plain", "404 Not Found".getBytes());
-            }
-        }
+    static void send(
+            HttpExchange exchange,
+            String text,
+            String type
+    ) throws IOException {
+
+        send(exchange, text.getBytes(), type);
     }
 
-    private static String getContentType(String path) {
-        if (path.endsWith(".html")) return "text/html";
-        if (path.endsWith(".css")) return "text/css";
-        if (path.endsWith(".js")) return "text/javascript";
-        return "text/plain";
-    }
 
-    private static void sendResponse(HttpExchange exchange, int status, String contentType, byte[] data) throws IOException {
-        exchange.getResponseHeaders().set("Content-Type", contentType + "; charset=UTF-8");
-        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
-        if ("HEAD".equalsIgnoreCase(exchange.getRequestMethod())) {
-            exchange.sendResponseHeaders(status, -1);
-        } else {
-            exchange.sendResponseHeaders(status, data.length);
-            OutputStream os = exchange.getResponseBody();
-            os.write(data);
-            os.close();
-        }
+    static void send(
+            HttpExchange exchange,
+            byte[] data,
+            String type
+    ) throws IOException {
+
+        exchange.getResponseHeaders().set(
+                "Content-Type",
+                type + "; charset=UTF-8"
+        );
+
+        exchange.sendResponseHeaders(200, data.length);
+
+        OutputStream output = exchange.getResponseBody();
+
+        output.write(data);
+
+        output.close();
     }
 }

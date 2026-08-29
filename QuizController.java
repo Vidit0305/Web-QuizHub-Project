@@ -1,84 +1,77 @@
 public class QuizController {
 
-    // Simple Question structure inside this file
-    static class Question {
-        int id;
-        String text;
-        String optionA;
-        String optionB;
-        String optionC;
-        String optionD;
-        String correctOption;
+    String[] questions = {
+        "Which keyword is used to create a class in Java?",
+        "Which method is the starting point of a Java program?",
+        "Which data type is used to store whole numbers in Java?",
+        "Which keyword is used to create an object in Java?",
+        "Which symbol is used to end a statement in Java?"
+    };
 
-        Question(int id, String text, String a, String b, String c, String d, String correct) {
-            this.id = id;
-            this.text = text;
-            this.optionA = a;
-            this.optionB = b;
-            this.optionC = c;
-            this.optionD = d;
-            this.correctOption = correct;
-        }
-    }
+    String[][] options = {
+        {"function", "class", "create", "object"},
+        {"start()", "run()", "main()", "begin()"},
+        {"String", "int", "boolean", "double"},
+        {"new", "object", "create", "class"},
+        {".", ":", ";", ","}
+    };
 
-    private Question[] questions;
+    String[] correctAnswers = {
+        "B",
+        "C",
+        "B",
+        "A",
+        "C"
+    };
 
-    public QuizController() {
-        questions = new Question[] {
-            new Question(1, "Which keyword is used to create a class in Java?", "function", "class", "create", "object", "B"),
-            new Question(2, "Which method is the starting point of a Java program?", "start()", "run()", "main()", "begin()", "C"),
-            new Question(3, "Which data type is used to store whole numbers in Java?", "String", "int", "boolean", "double", "B"),
-            new Question(4, "Which keyword is used to create an object in Java?", "new", "object", "create", "class", "A"),
-            new Question(5, "Which symbol is used to end a statement in Java?", ".", ":", ";", ",", "C")
-        };
-    }
 
-    // Returns JSON array of questions without exposing the correct answer
-    public String getQuestionsJson() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
+    public String getQuestions() {
+
+        String result = "[";
+
         for (int i = 0; i < questions.length; i++) {
-            Question q = questions[i];
-            sb.append("{");
-            sb.append("\"id\":").append(q.id).append(",");
-            sb.append("\"question\":\"").append(escapeJson(q.text)).append("\",");
-            sb.append("\"optionA\":\"").append(escapeJson(q.optionA)).append("\",");
-            sb.append("\"optionB\":\"").append(escapeJson(q.optionB)).append("\",");
-            sb.append("\"optionC\":\"").append(escapeJson(q.optionC)).append("\",");
-            sb.append("\"optionD\":\"").append(escapeJson(q.optionD)).append("\"");
-            sb.append("}");
+
+            result += "{";
+            result += "\"id\":" + (i + 1) + ",";
+            result += "\"question\":\"" + questions[i] + "\",";
+            result += "\"optionA\":\"" + options[i][0] + "\",";
+            result += "\"optionB\":\"" + options[i][1] + "\",";
+            result += "\"optionC\":\"" + options[i][2] + "\",";
+            result += "\"optionD\":\"" + options[i][3] + "\"";
+            result += "}";
+
             if (i < questions.length - 1) {
-                sb.append(",");
-            }
-        }
-        sb.append("]");
-        return sb.toString();
-    }
-
-    // Receives user answers JSON and calculates score
-    public String calculateResultJson(String body) {
-        int correct = 0;
-        int total = questions.length;
-
-        // Clean spaces to ensure straightforward matching
-        String cleanBody = body.replaceAll("\\s+", "");
-
-        for (Question q : questions) {
-            String tag1 = "\"questionId\":" + q.id + ",\"selectedAnswer\":\"" + q.correctOption + "\"";
-            String tag2 = "\"selectedAnswer\":\"" + q.correctOption + "\",\"questionId\":" + q.id;
-            String tag3 = "\"questionId\":" + q.id + ",\"selectedAnswer\":\"" + q.correctOption.toLowerCase() + "\"";
-            String tag4 = "\"selectedAnswer\":\"" + q.correctOption.toLowerCase() + "\",\"questionId\":" + q.id;
-
-            if (cleanBody.contains(tag1) || cleanBody.contains(tag2) || cleanBody.contains(tag3) || cleanBody.contains(tag4)) {
-                correct++;
+                result += ",";
             }
         }
 
-        int score = (correct * 100) / total;
-        return "{\"totalQuestions\":" + total + ",\"correctAnswers\":" + correct + ",\"score\":" + score + "}";
+        result += "]";
+
+        return result;
     }
 
-    private String escapeJson(String s) {
-        return s.replace("\"", "\\\"");
+
+    public String checkAnswers(String answers) {
+
+        int score = 0;
+
+        for (int i = 0; i < correctAnswers.length; i++) {
+
+            String answer = "\"questionId\":" + (i + 1)
+                    + ",\"selectedAnswer\":\""
+                    + correctAnswers[i] + "\"";
+
+            if (answers.contains(answer)) {
+                score++;
+            }
+        }
+
+        int percentage = score * 100 / questions.length;
+
+        return "{"
+                + "\"totalQuestions\":" + questions.length + ","
+                + "\"correctAnswers\":" + score + ","
+                + "\"score\":" + percentage
+                + "}";
     }
 }
