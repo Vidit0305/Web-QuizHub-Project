@@ -12,18 +12,22 @@ public class QuizHub implements HttpHandler {
 
     static QuizController quiz = new QuizController();
 
+    private static final int PORT = Integer.parseInt(
+            System.getenv().getOrDefault("PORT", "8080")
+    );
+
 
     public static void main(String[] args) throws IOException {
 
         HttpServer server = HttpServer.create(
-                new InetSocketAddress(8080), 0
+                new InetSocketAddress(PORT), 0
         );
 
         server.createContext("/", new QuizHub());
 
         server.start();
 
-        System.out.println("QuizHub is running at http://localhost:8080");
+        System.out.println("QuizHub is running at http://localhost:" + PORT);
     }
 
 
